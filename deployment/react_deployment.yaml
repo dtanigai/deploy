@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: react-app
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      containers:
+        - name: react-app
+          image: 244680720314.dkr.ecr.eu-north-1.amazonaws.com/cloudapp/frontend:latest # Replace with your React Docker image hosted on DockerHub or ECR
+          envFrom:
+            - configMapRef:
+                name: react-config # Reference the ConfigMap for environment variables
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_APP_FLASK_API_URL
+              value: "https://mocki.io/v1/7cbc4c9e-7208-4772-97b2-cc9a2da061c9"
+            - name: WDS_SOCKET_PORT
+              value: "0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-frontend
+spec:
+  type: LoadBalancer # Expose externally; change to ClusterIP if internal-only access is needed
+  selector:
+    app: react-app
+  ports:
+    - protocol: TCP
+      port: 80 # External port to access the React app
+      targetPort: 80 # Container port where React is running (from deployment)

@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard-storage
+provisioner: kubernetes.io/aws-ebs # Example for AWS EBS volumes
+parameters:
+  type: gp2
+volumeBindingMode: Immediate
